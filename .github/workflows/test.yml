@@ -1,4 +1,4 @@
-name: boot需要修改为pe官方提供的img！编译内核 ( LXC/Docker + USB/IP + UMI )
+name: boot需要修改为pe官方提供的img！编译内核 ( LXC/Docker + USB/IP + RTL8188EUS )
 
 on:
   push:
