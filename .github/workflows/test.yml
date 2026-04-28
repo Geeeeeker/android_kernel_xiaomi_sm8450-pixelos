@@ -152,7 +152,12 @@ jobs:
           ./scripts/kconfig/merge_config.sh -m -O out \
             arch/arm64/configs/gki_defconfig \
             arch/arm64/configs/vendor/cupid_GKI.config \
-            arch/arm64/configs/vendor/xiaomi_GKI.config
+            arch/arm64/configs/vendor/xiaomi_GKI.config \
+            arch/arm64/configs/vendor/xiaomi/docker.config \
+            arch/arm64/configs/vendor/xiaomi/gcc.config \
+            arch/arm64/configs/vendor/xiaomi/kernelsu.config \
+            arch/arm64/configs/vendor/xiaomi/pgsql.config \
+            arch/arm64/configs/vendor/xiaomi/usb.config
 
       # ========== 编译主内核 ==========
       - name: 编译内核
