@@ -15,12 +15,11 @@ on:
         default: 'sixteen-qpr2'
         type: choice
         options:
-          - 'sixteen'
           - 'sixteen-qpr1'
           - 'sixteen-qpr2'
 
 env:
-  DEVICE: venus
+  DEVICE: cupid
   DEFCONFIG: gki_defconfig
   MAGISK_CANARY_URL: https://github.com/topjohnwu/Magisk/releases/download/v30.7/Magisk-v30.7.apk
   KERNELSU_VERSION: v0.9.5
@@ -29,7 +28,7 @@ env:
 
 jobs:
   build:
-    name: 编译内核 (venus)
+    name: 编译内核 (cupid)
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -124,7 +123,6 @@ jobs:
 
           sed -i '/CONFIG_LOCALVERSION/d' "${DEFCONFIG}"
           echo 'CONFIG_LOCALVERSION="-LXC-KSU-Next"' >> "${DEFCONFIG}"
-
       - name: 添加 rtl8188eus WiFi 驱动
         working-directory: kernel
         run: |
@@ -138,7 +136,6 @@ jobs:
             exit 1
           fi
           rm -rf rtl8188eus-repo
-
       # ========== 合并设备专用配置 ==========
       - name: 合并基础内核配置片段
         working-directory: kernel
@@ -154,9 +151,8 @@ jobs:
 
           ./scripts/kconfig/merge_config.sh -m -O out \
             arch/arm64/configs/gki_defconfig \
-            arch/arm64/configs/vendor/venus_QGKI.config \
-            arch/arm64/configs/vendor/xiaomi_QGKI.config
-
+            arch/arm64/configs/vendor/cupid_GKI.config \
+            arch/arm64/configs/vendor/xiaomi_GKI.config
 
       # ========== 编译主内核 ==========
       - name: 编译内核
@@ -326,7 +322,7 @@ jobs:
           cp kernel/out/arch/arm64/boot/Image.gz-dtb mkbootimg/
 
           cd mkbootimg
-          # TODO: 请替换为 venus 专用 boot.img
+          # TODO: 请替换为 cupid 专用 boot.img
           BOOT_IMG_URL="https://github.com/Geeeeeker/boot/releases/download/extracted-roms-20260322-062443/LineageOS_boot.img"
           curl -LSs "$BOOT_IMG_URL" -o boot.img
 
