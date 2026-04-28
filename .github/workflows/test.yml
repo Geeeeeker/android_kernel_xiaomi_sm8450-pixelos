@@ -158,7 +158,18 @@ jobs:
             arch/arm64/configs/vendor/xiaomi/kernelsu.config \
             arch/arm64/configs/vendor/xiaomi/pgsql.config \
             arch/arm64/configs/vendor/xiaomi/usb.config
+      # ========== 解决重复驱动冲突 ==========
+      - name: 禁用冲突驱动并注释 Btrfs 编译
+        working-directory: kernel
+        run: |
+          # 直接注释 fs/Makefile 中的 btrfs 目标，彻底排除编译
+          if [ -f fs/Makefile ]; then
+            sed -i '/btrfs/s/^/# /' fs/Makefile
+            echo "Btrfs compilation disabled in fs/Makefile"
+          fi
 
+          # 非交互更新配置
+          make O=out ARCH=arm64 olddefconfig </dev/null
       # ========== 编译主内核 ==========
       - name: 编译内核
         working-directory: kernel
