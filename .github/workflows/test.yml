@@ -90,25 +90,24 @@ jobs:
           restore-keys: kernel-${{ env.DEVICE }}-${{ env.ANDROID_VERSION }}
           max-size: 5G
 
-      # ========== 内核配置修改 (LXC/Docker) ==========
       - name: 配置 LXC 和 Docker 内核支持
         working-directory: kernel
         run: |
           DEFCONFIG="arch/arm64/configs/${{ env.DEFCONFIG }}"
-
+      
           rm -rf utils
           git clone https://github.com/tomxi1997/lxc-docker-support-for-android.git utils
-
+      
           if ! grep -q 'source "utils/Kconfig"' Kconfig; then
             echo 'source "utils/Kconfig"' >> Kconfig
           fi
-
+      
           echo "CONFIG_DOCKER=y" >> "${DEFCONFIG}"
           echo "CONFIG_VLAN_8021Q=m" >> "${DEFCONFIG}"
-
+      
           sed -i '/CONFIG_ANDROID_PARANOID_NETWORK/d' "${DEFCONFIG}"
           echo "# CONFIG_ANDROID_PARANOID_NETWORK is not set" >> "${DEFCONFIG}"
-
+      
           if [ -f kernel/cgroup/cgroup.c ]; then
             sh utils/runcpatch.sh kernel/cgroup/cgroup.c
           elif [ -f kernel/cgroup.c ]; then
@@ -116,9 +115,15 @@ jobs:
           else
             echo "Warning: cgroup.c not found, skipping runcpatch.sh"
           fi
-
+      
           if [ -f net/netfilter/xt_qtaguid.c ]; then
             patch -p0 < utils/xt_qtaguid.patch
+          fi
+
+          # 修复 netprio_cgroup.c 中的过时 cgroup->id 访问
+          if [ -f net/core/netprio_cgroup.c ]; then
+            sed -i 's/css->cgroup->id/cgroup_id(css->cgroup)/g' net/core/netprio_cgroup.c
+            echo "Patched netprio_cgroup.c to use cgroup_id()"
           fi
 
           sed -i '/CONFIG_LOCALVERSION/d' "${DEFCONFIG}"
