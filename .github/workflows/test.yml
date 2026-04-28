@@ -131,6 +131,8 @@ jobs:
       - name: 添加 rtl8188eus WiFi 驱动
         working-directory: kernel
         run: |
+          # 修复多余的括号警告 (if ((IS_FULL_SPEED_USB(...)))) → if (IS_FULL_SPEED_USB(...))
+          find drivers/rtl8188eus -type f -name "*.c" -exec sed -i 's/if ((IS_FULL_SPEED_USB(\(.*\))))/if (IS_FULL_SPEED_USB(\1))/g' {} \;
           git clone --depth=1 --branch master https://github.com/Geeeeeker/android_kernel_xiaomi_sdm845.git rtl8188eus-repo
           if [ -d "rtl8188eus-repo/drivers/rtl8188eus" ]; then
             cp -r rtl8188eus-repo/drivers/rtl8188eus drivers/
@@ -183,7 +185,6 @@ jobs:
           fi
           # 非交互更新配置
           make O=out ARCH=arm64 olddefconfig </dev/null
-      # ========== 编译主内核 ==========
       - name: 编译内核
         working-directory: kernel
         run: |
@@ -201,7 +202,7 @@ jobs:
             LLVM=1 \
             LLVM_IAS=1 \
             O=out \
-            KCFLAGS="-Wno-unknown-warning-option -Wno-unused-but-set-variable" \
+            KCFLAGS="-Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-frame-larger-than -Wno-parentheses-equality" \
             Image.gz-dtb
 
       # ========== USB/IP 支持 ==========
