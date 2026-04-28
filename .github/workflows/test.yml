@@ -200,7 +200,7 @@ jobs:
             LLVM=1 \
             LLVM_IAS=1 \
             O=out \
-            KCFLAGS="-Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-frame-larger-than -Wno-parentheses-equality" \
+            KCFLAGS="-Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-frame-larger-than -Wno-parentheses-equality -Wno-tautological-overlap-compare" \
             Image.gz-dtb
 
       # ========== USB/IP 支持 ==========
